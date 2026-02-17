@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="mainHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ONE 1 | PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root { --p: #6c5ce7; --bg: #ffffff; --gray: #f8f9fa; --border: #eee; --text: #2d3436; --red: #ff4757; --green: #2ecc71; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; display: flex; align-items: center; justify-content: center;
+            z-index: 10000; transition: opacity 0.8s ease; padding: 30px; text-align: center;
+        }
+        #splash-text {
+            font-size: 22px; font-weight: bold; color: var(--p);
+            opacity: 0; transform: translateY(20px); transition: all 1s ease;
+        }
+        #splash-text.show { opacity: 1; transform: translateY(0); }
+
+        #mainContent { display: none; }
+
+        body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+        header { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; background: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .logo { font-size: 18px; font-weight: 900; color: var(--p); }
+
+        .page { padding: 15px; min-height: 80vh; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .visitor-section { display: flex; align-items: center; justify-content: flex-end; padding: 10px 5px; gap: 10px; }
+        .visitor-stack { display: flex; align-items: center; direction: ltr; }
+        .visitor-stack img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; margin-right: -10px; object-fit: cover; }
+        .more-visitors { width: 28px; height: 28px; border-radius: 50%; background: #dfe6e9; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; margin-right: -10px; font-weight: bold; }
+
+        .profile-top { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+        .avatar-container { position: relative; width: 100px; height: 100px; margin-bottom: 15px; }
+        .avatar-container img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--border); object-fit: cover; }
+        .status-dot { position: absolute; bottom: 8px; right: 8px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; background: #bdc3c7; }
+        .status-dot.online { background: var(--green); }
+
+        .stats-row { display: flex; gap: 30px; margin-bottom: 15px; }
+        .stat-item { text-align: center; }
+        .stat-val { display: block; font-weight: 800; font-size: 18px; }
+        .stat-lab { font-size: 12px; color: #95a5a6; }
+
+        .edit-btn { background: var(--gray); border: 1px solid var(--border); padding: 10px 40px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+        .group-header { padding: 15px 15px 5px; font-size: 12px; color: #a4b0be; font-weight: bold; }
+        .settings-group { background: #fff; border: 1px solid var(--border); border-radius: 18px; margin: 0 15px 15px; overflow: hidden; }
+        .setting-item { display: flex; align-items: center; padding: 14px 15px; cursor: pointer; border-bottom: 1px solid var(--border); }
+        .setting-item i { width: 30px; color: var(--p); font-size: 16px; margin-left: 10px; }
+        .danger-text { color: var(--red) !important; }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #f0f0f0; z-index: 2000; }
+        .nav-item { color: #bdc3c7; font-size: 22px; cursor: pointer; }
+        .nav-item.active { color: var(--p); }
+
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 5000; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div id="splash-text">أهلاً بك في ONE 1<br><small style="font-size:14px; color:#aaa; font-weight:normal;">يرجى تسجيل الدخول للمتابعة...</small></div>
+    </div>
+
+    <div id="mainContent">
+        <div id="toast"></div>
+
+        <header>
+            <div style="width:32px;height:32px;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:bold;">W</div>
+            <div class="logo">ONE 1</div>
+            <i class="fa-solid fa-bars" style="opacity:0"></i>
+        </header>
+
+        <div id="profile" class="page">
+            <div class="visitor-section">
+                <div class="visitor-stack">
+                    <div class="more-visitors">+0</div>
+                    <img src="https://ui-avatars.com/api/?name=V">
+                </div>
+                <div style="font-size: 13px; color: #7f8c8d;"><i class="fa-regular fa-eye"></i> <span id="viewCount">0</span></div>
+            </div>
+
+            <div class="profile-top">
+                <div class="avatar-container">
+                    <img src="" id="uImg">
+                    <div id="onStatus" class="status-dot online"></div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">منشور</span></div>
+                    <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">متابع</span></div>
+                    <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">أتابعه</span></div>
+                </div>
+                <div style="text-align:center; margin-bottom:15px;">
+                    <h2 id="uName" style="margin:0">...</h2>
+                    <p id="uEmail" style="margin:0; font-size:12px; color:#aaa;"></p>
+                </div>
+                <button class="edit-btn">تعديل الملف الشخصي</button>
+            </div>
+
+            <div class="group-header">إعدادات الحساب</div>
+            <div class="settings-group">
+                <div class="setting-item"><i class="fa-regular fa-user"></i><span style="flex:1">تغيير الاسم</span></div>
+                <div class="setting-item" style="color:var(--red)"><i class="fa-solid fa-trash-can"></i><span>حذف الحساب نهائياً</span></div>
+            </div>
+
+            <div class="group-header">الخصوصية</div>
+            <div class="settings-group">
+                <div class="setting-item">
+                    <i class="fa-solid fa-eye-slash"></i>
+                    <span style="flex:1">إخفاء حالة المتصل</span>
+                    <input type="checkbox" style="width:18px; height:18px;">
+                </div>
+            </div>
+            
+            <div class="settings-group" style="margin-top:20px;">
+                <div class="setting-item" onclick="signOut(auth)" style="color:var(--red)"><i class="fa-solid fa-power-off"></i><span>تسجيل الخروج</span></div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active"><i class="fa-solid fa-circle-user"></i></div>
+            <div class="nav-item"><i class="fa-regular fa-comment"></i></div>
+            <div class="nav-item"><i class="fa-solid fa-house"></i></div>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const config = { apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", authDomain: "one1-95c0e.firebaseapp.com", projectId: "one1-95c0e", appId: "1:1090900617422:web:f6e9c11bb7a090c39ec89f" };
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.onload = () => {
+            const txt = document.getElementById('splash-text');
+            const screen = document.getElementById('splash-screen');
+            
+            setTimeout(() => txt.classList.add('show'), 500);
+
+            setTimeout(() => {
+                screen.style.opacity = '0';
+                setTimeout(() => {
+                    screen.style.display = 'none';
+                    checkUserStatus();
+                }, 800);
+            }, 3500); 
+        };
+
+        function checkUserStatus() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById('mainContent').style.display = "block";
+                    loadUserData(user);
+                } else {
+                    window.location.href = "auth.html";
+                }
+            });
+        }
+
+        function loadUserData(user) {
+            onSnapshot(doc(db, "users", user.uid), (ds) => {
+                if (ds.exists()) {
+                    const d = ds.data();
+                    document.getElementById('uName').innerText = d.name || "مستخدم";
+                    document.getElementById('uEmail').innerText = user.email;
+                    document.getElementById('uImg').src = d.photo || `https://ui-avatars.com/api/?background=6c5ce7&color=fff&name=${d.name}`;
+                }
+            });
+        }
+
+        window.signOut = () => signOut(auth);
+    </script>
+</body>
+</html>
