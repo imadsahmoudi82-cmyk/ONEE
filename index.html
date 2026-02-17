@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="mainHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ONE 1 | PRO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root { --p: #6c5ce7; --bg: #ffffff; --gray: #f8f9fa; --border: #eee; --text: #2d3436; --red: #ff4757; --green: #2ecc71; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; display: none; }
+        
+        /* شاشة الترحيب */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--p);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 9999;
+        }
+        #splash-screen.show { opacity: 1; }
+        #splash-screen.hide { opacity: 0; }
+
+        header { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; background: #fff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .logo { font-size: 18px; font-weight: 900; color: var(--p); }
+
+        .page { display: none; padding: 15px; min-height: 80vh; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* نظام الزوار العلوي */
+        .visitor-section { display: flex; align-items: center; justify-content: flex-end; padding: 10px 5px; gap: 10px; }
+        .visitor-stack { display: flex; align-items: center; direction: ltr; cursor: pointer; }
+        .visitor-stack img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; margin-right: -10px; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .more-visitors { width: 28px; height: 28px; border-radius: 50%; background: #dfe6e9; font-size: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; margin-right: -10px; font-weight: bold; }
+
+        /* الملف الشخصي */
+        .profile-top { display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+        .avatar-container { position: relative; width: 100px; height: 100px; margin-bottom: 15px; }
+        .avatar-container img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--border); object-fit: cover; }
+        .status-dot { position: absolute; bottom: 8px; right: 8px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; background: #bdc3c7; }
+        .status-dot.online { background: var(--green); }
+
+        .stats-row { display: flex; gap: 30px; margin-bottom: 15px; }
+        .stat-item { text-align: center; }
+        .stat-val { display: block; font-weight: 800; font-size: 18px; }
+        .stat-lab { font-size: 12px; color: #95a5a6; }
+
+        .user-details { text-align: center; margin-bottom: 20px; }
+        .user-details h2 { margin: 0; font-size: 18px; }
+        .user-details p { margin: 2px 0; color: #7f8c8d; font-size: 13px; }
+
+        .edit-btn { background: var(--gray); border: 1px solid var(--border); padding: 10px 40px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+        /* الإعدادات */
+        .group-header { padding: 15px 15px 5px; font-size: 12px; color: #a4b0be; font-weight: bold; }
+        .settings-group { background: #fff; border: 1px solid var(--border); border-radius: 18px; margin: 0 15px 15px; overflow: hidden; }
+        .setting-item { display: flex; align-items: center; padding: 14px 15px; cursor: pointer; border-bottom: 1px solid var(--border); }
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item i { width: 30px; color: var(--p); font-size: 16px; margin-left: 10px; }
+        .setting-text { flex: 1; font-size: 14px; }
+        .danger-text { color: var(--red) !important; }
+
+        /* المودال (التحذير واللغة) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 4000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; width: 100%; max-width: 340px; border-radius: 25px; padding: 25px; text-align: center; }
+        .btn-main { background: var(--p); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px; }
+        .btn-danger { background: var(--red); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #f0f0f0; z-index: 2000; }
+        .nav-item { color: #bdc3c7; font-size: 22px; cursor: pointer; }
+        .nav-item.active { color: var(--p); }
+
+        #toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #2d3436; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; z-index: 5000; display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">أهلاً بك! لِتُكمل رحلتك، يرجى تسجيل الدخول أو إنشاء حساب جديد.</div>
+
+    <header id="mainHeader" style="display: none;">
+        <div style="width:32px;height:32px;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font-weight:bold;">W</div>
+        <div class="logo">ONE 1</div>
+        <i class="fa-solid fa-bars" style="opacity:0"></i>
+    </header>
+
+    <div id="profile" class="page active" style="display: none;">
+        <div class="visitor-section">
+            <div class="visitor-stack" onclick="showT('قائمة الزوار الكاملة ستتوفر قريباً')">
+                <div class="more-visitors">+0</div>
+                <img src="https://ui-avatars.com/api/?name=User3">
+                <img src="https://ui-avatars.com/api/?name=User2">
+                <img src="https://ui-avatars.com/api/?name=User1">
+            </div>
+            <div style="font-size: 13px; color: #7f8c8d;"><i class="fa-regular fa-eye"></i> <span id="viewCount">0</span></div>
+        </div>
+
+        <div class="profile-top">
+            <div class="avatar-container">
+                <img src="" id="uImg">
+                <div id="onStatus" class="status-dot online"></div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">منشور</span></div>
+                <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">متابع</span></div>
+                <div class="stat-item"><span class="stat-val">0</span><span class="stat-lab">أتابعه</span></div>
+            </div>
+
+            <div class="user-details">
+                <h2 id="uName">...</h2>
+                <p id="uEmail"></p>
+            </div>
+            <button class="edit-btn" onclick="showT('استخدم الإعدادات بالأسفل')">تعديل الملف الشخصي</button>
+        </div>
+
+        <div class="group-header">إعدادات الحساب</div>
+        <div class="settings-group">
+            <div class="setting-item" onclick="openM('name')"><i class="fa-regular fa-user"></i><span class="setting-text">تغيير الاسم</span></div>
+            <div class="setting-item" onclick="openM('reset')"><i class="fa-solid fa-lock"></i><span class="setting-text">كلمة السر</span></div>
+            <div class="setting-item" onclick="openM('delete')"><i class="fa-solid fa-trash-can danger-text"></i><span class="setting-text danger-text">حذف الحساب نهائياً</span></div>
+        </div>
+
+        <div class="group-header">اللغة</div>
+        <div class="settings-group">
+            <div class="setting-item" onclick="openM('lang')"><i class="fa-solid fa-globe"></i><span class="setting-text">لغة التطبيق</span></div>
+        </div>
+
+        <div class="group-header">الخصوصية والأمان</div>
+        <div class="settings-group">
+            <div class="setting-item" onclick="showT('قائمة الحظر فارغة')"><i class="fa-solid fa-user-slash"></i><span class="setting-text">إدارة الحظر</span></div>
+            <div class="setting-item">
+                <i class="fa-solid fa-eye-slash"></i>
+                <span class="setting-text">إخفاء حالة المتصل</span>
+                <input type="checkbox" onchange="toggleOnline(this)" style="width:20px; height:20px;">
+            </div>
+        </div>
+
+        <div class="group-header">الدعم</div>
+        <div class="settings-group">
+            <div class="setting-item" onclick="window.open('https://wa.me/972592738901')"><i class="fa-brands fa-whatsapp"></i><span class="setting-text">الدعم الفني</span></div>
+            <div class="setting-item" onclick="signOut(auth)" style="color:var(--red);"><i class="fa-solid fa-power-off"></i><span class="setting-text">تسجيل الخروج</span></div>
+        </div>
+    </div>
+
+    <div id="m" class="modal">
+        <div class="modal-content">
+            <h3 id="mT">تنبيه</h3>
+            <div id="langChoices" style="display:none; flex-direction:column; gap:10px;">
+                <button class="btn-main" onclick="location.reload()" style="background:#f1f3f5; color:#333;">العربية</button>
+                <button class="btn-main" onclick="location.reload()" style="background:#f1f3f5; color:#333;">English</button>
+            </div>
+            <div id="deleteBox" style="display:none;">
+                <p style="color:#e74c3c; font-weight:bold;">هل أنت متأكد؟</p>
+                <p style="font-size:13px; color:#7f8c8d;">سيتم حذف كافة بياناتك ولا يمكن استعادتها.</p>
+                <button class="btn-danger" onclick="showT('تم إرسال طلب الحذف للإدارة')">تأكيد الحذف النهائي</button>
+            </div>
+            <input type="text" id="mInp" style="width:100%; padding:12px; border:1px solid #eee; border-radius:10px; margin-bottom:15px; display:none; text-align:center;">
+            <button class="btn-main" id="mBtn" onclick="saveM()">تحديث</button>
+            <p onclick="closeM()" style="margin-top:15px; color:#aaa; cursor:pointer; font-size:13px;">إلغاء</p>
+        </div>
+    </div>
+
+    <nav class="bottom-nav" id="mainNav" style="display: none;">
+        <div class="nav-item active"><i class="fa-solid fa-circle-user"></i></div>
+        <div class="nav-item"><i class="fa-regular fa-comment"></i></div>
+        <div class="nav-item" style="background:var(--p); color:#fff; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-top:-30px;"><i class="fa-solid fa-plus"></i></div>
+        <div class="nav-item"><i class="fa-regular fa-heart"></i></div>
+        <div class="nav-item" onclick="showT('الرئيسية قيد التطوير')"><i class="fa-solid fa-house"></i></div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // شاشة الترحيب
+        document.addEventListener("DOMContentLoaded", () => {
+            const splashScreen = document.getElementById('splash-screen');
+            splashScreen.classList.add('show'); // إظهار الشاشة
+            
+            setTimeout(() => {
+                splashScreen.classList.remove('show');
+                splashScreen.classList.add('hide'); // إخفاء الشاشة بسلاسة
+                setTimeout(() => {
+                    splashScreen.style.display = 'none'; // إزالتها بعد انتهاء الانتقال
+                    // هنا يتم الانتقال لصفحة تسجيل الدخول
+                    window.location.href = "auth.html"; 
+                }, 1000); // مدة تتوافق مع transition opacity
+            }, 3000); // 3 ثواني لإظهار الرسالة + 1 ثانية للانتقال = 4 ثواني كما طلبت
+        });
+
+        const config = { apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", authDomain: "one1-95c0e.firebaseapp.com", projectId: "one1-95c0e", appId: "1:1090900617422:web:f6e9c11bb7a090c39ec89f" };
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.showT = (msg) => { const t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); };
+        
+        window.toggleOnline = (cb) => {
+            const dot = document.getElementById('onStatus');
+            dot.className = cb.checked ? 'status-dot' : 'status-dot online';
+            showT(cb.checked ? "أنت تظهر الآن كـ أوف لاين" : "أنت تظهر كـ متصل");
+        };
+
+        let mode = '';
+        window.openM = (m) => {
+            mode = m;
+            document.getElementById('m').style.display = 'flex';
+            document.getElementById('mInp').style.display = (m==='name')?'block':'none';
+            document.getElementById('deleteBox').style.display = (m==='delete')?'block':'none';
+            document.getElementById('langChoices').style.display = (m==='lang')?'flex':'none';
+            document.getElementById('mBtn').style.display = (m==='name' || m==='reset')?'block':'none';
+            
+            if(m==='name') document.getElementById('mT').innerText = "تغيير الاسم";
+            if(m==='reset') document.getElementById('mT').innerText = "رابط كلمة السر";
+            if(m==='delete') document.getElementById('mT').innerText = "حذف الحساب";
+            if(m==='lang') document.getElementById('mT').innerText = "اختر اللغة";
+        };
+
+        window.closeM = () => document.getElementById('m').style.display = 'none';
+
+        window.saveM = async () => {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            if(mode === 'name') {
+                const n = document.getElementById('mInp').value;
+                if(n) { await updateDoc(userRef, { name: n }); showT("تم التحديث"); }
+            }
+            if(mode === 'reset') {
+                await sendPasswordResetEmail(auth, auth.currentUser.email);
+                showT("تحقق من بريدك الإلكتروني");
+            }
+            closeM();
+        };
+
+        // هذا الجزء سيعمل فقط بعد تسجيل الدخول ومرور الشاشة الترحيبية
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('mainHeader').style.display = "flex";
+                document.getElementById('profile').style.display = "block";
+                document.getElementById('mainNav').style.display = "flex";
+
+                onSnapshot(doc(db, "users", user.uid), (ds) => {
+                    if (ds.exists()) {
+                        const d = ds.data();
+                        document.getElementById('uName').innerText = d.name || "مستخدم";
+                        document.getElementById('uEmail').innerText = user.email;
+                        document.getElementById('uImg').src = d.photo || `https://ui-avatars.com/api/?background=6c5ce7&color=fff&name=${d.name}`;
+                        document.getElementById('viewCount').innerText = d.views || "0";
+                    }
+                });
+            } else { 
+                // إذا لم يكن هناك مستخدم مسجل دخول، سيتم توجيهه إلى auth.html
+                // وهذا سيحدث بعد شاشة الترحيب
+            }
+        });
+
+        window.signOut = () => signOut(auth);
+    </script>
+</body>
+</html>
